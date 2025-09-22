@@ -1,0 +1,807 @@
+{
+  "$schema": "https://schema.takeshape.io/project-schema",
+  "defaultLocale": "en-us",
+  "locales": [
+    "en-us"
+  ],
+  "queries": {
+    "BigCommerce_product": {
+      "resolver": {
+        "name": "graphql:query",
+        "service": "big-commerce",
+        "fieldName": "site.product",
+        "args": {
+          "ops": [
+            {
+              "path": "entityId",
+              "mapping": "$args.id"
+            }
+          ]
+        }
+      },
+      "args": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "shape": "BigCommerce_Product"
+    },
+    "BigCommerce_products": {
+      "resolver": {
+        "name": "graphql:query",
+        "service": "big-commerce",
+        "fieldName": "site.products"
+      },
+      "args": {
+        "type": "object",
+        "properties": {
+          "before": {
+            "type": "string"
+          },
+          "after": {
+            "type": "string"
+          },
+          "first": {
+            "type": "integer",
+            "maximum": 50,
+            "minimum": 1,
+            "description": "How many items to get after the the cursor"
+          },
+          "last": {
+            "type": "integer",
+            "maximum": 50,
+            "minimum": 1,
+            "description": "How many items to get before the cursor"
+          }
+        }
+      },
+      "shape": "BigCommerce_ProductConnection"
+    },
+    "getIndexedBigCommerceProductList": {
+      "shape": "PaginatedList<BigCommerce_Product>",
+      "resolver": {
+        "shapeName": "BigCommerce_Product",
+        "name": "takeshape:queryApiIndex",
+        "service": "takeshape",
+        "options": {
+          "indexedShape": "BigCommerce_Product"
+        }
+      },
+      "description": "Fetch BigCommerce_Product data from the API Index.",
+      "args": "TSListArgs<BigCommerce_Product>"
+    },
+    "getRelatedBigCommerceProductByVectorList": {
+      "shape": "PaginatedList<BigCommerce_Product>",
+      "args": "TSEmbeddingSearchArgs",
+      "resolver": {
+        "name": "ai:embeddingSearch",
+        "vectorProperty": "big-commerce:Product.vector"
+      }
+    },
+    "searchBigCommerceProductByVector": {
+      "shape": "PaginatedList<BigCommerce_Product>",
+      "args": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          }
+        }
+      },
+      "resolver": {
+        "name": "ai:embeddingSearch",
+        "vectorProperty": "big-commerce:Product.vector"
+      }
+    },
+    "getStoreResearch": {
+      "shape": "StoreResearch",
+      "resolver": {
+        "name": "shapedb:get",
+        "service": "shapedb",
+        "shapeName": "StoreResearch"
+      },
+      "description": "Get a StoreResearch by ID",
+      "args": "TSGetArgs<StoreResearch>"
+    }
+  },
+  "mutations": {
+    "updateStoreResearch": {
+      "shape": "UpdateResult<StoreResearch>",
+      "resolver": {
+        "name": "shapedb:update",
+        "service": "shapedb",
+        "shapeName": "StoreResearch"
+      },
+      "description": "Update StoreResearch",
+      "args": "UpdateArgs<StoreResearch>"
+    },
+    "BigCommerce_createCart": {
+      "resolver": {
+        "name": "graphql:mutation",
+        "service": "big-commerce",
+        "fieldName": "cart.createCart",
+        "args": {
+          "ops": [
+            {
+              "path": "input.lineItems[0].quantity",
+              "mapping": "$args.quantity"
+            },
+            {
+              "path": "input.lineItems[0].productEntityId",
+              "mapping": "$args.id"
+            }
+          ]
+        }
+      },
+      "args": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          }
+        }
+      },
+      "shape": "BigCommerce_CreateCartResult"
+    },
+    "BigCommerce_updateCart": {
+      "resolver": {
+        "name": "graphql:mutation",
+        "service": "big-commerce",
+        "fieldName": "cart.addCartLineItems",
+        "args": {
+          "ops": [
+            {
+              "path": "input.cartEntityId",
+              "mapping": "$args.cartId"
+            },
+            {
+              "path": "input.data.lineItems[0].quantity",
+              "mapping": "$args.quantity"
+            },
+            {
+              "path": "input.data.lineItems[0].productEntityId",
+              "mapping": "$args.id"
+            }
+          ]
+        }
+      },
+      "args": {
+        "type": "object",
+        "properties": {
+          "cartId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          }
+        }
+      },
+      "shape": "BigCommerce_AddCartLineItemsResult"
+    },
+    "BigCommerce_cart": {
+      "resolver": {
+        "name": "graphql:mutation",
+        "service": "big-commerce",
+        "fieldName": "cart"
+      },
+      "shape": "BigCommerce_CartMutations"
+    }
+  },
+  "shapes": {
+    "BigCommerce_Product": {
+      "id": "BigCommerce_Product",
+      "name": "BigCommerce_Product",
+      "title": "Big Commerce Product",
+      "cache": {
+        "enabled": true,
+        "triggers": [],
+        "idField": "entityId",
+        "fragment": {
+          "maxDepth": 2
+        }
+      },
+      "loaders": {
+        "list": {
+          "query": "Query.BigCommerce_products"
+        },
+        "get": {
+          "query": "Query.BigCommerce_product"
+        }
+      },
+      "schema": {
+        "extends": [
+          {
+            "@ref": "big-commerce:Product"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "tid": {
+                "@dependencies": "{ entityId }",
+                "@resolver": {
+                  "name": "util:noop",
+                  "results": {
+                    "ops": [
+                      {
+                        "path": "$",
+                        "mapping": [
+                          [
+                            "get",
+                            {
+                              "path": "$source.entityId"
+                            }
+                          ],
+                          [
+                            "format",
+                            {
+                              "template": "tid:big-commerce:Product:%s"
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "type": "string",
+                "@mapping": "shapedb:BigCommerce_Product.rmWV-SGos",
+                "title": "TakeShape ID"
+              },
+              "imageUrl": {
+                "@dependencies": "{ thumbnail: defaultImage { url(width: 100) } }",
+                "@resolver": {
+                  "name": "util:noop",
+                  "results": {
+                    "ops": [
+                      {
+                        "path": "$",
+                        "mapping": "$source.$$thumbnail.url"
+                      }
+                    ]
+                  }
+                },
+                "type": "string",
+                "@mapping": "shapedb:BigCommerce_Product.pNTGoaCGa",
+                "title": "Image URL"
+              },
+              "title": {
+                "@dependencies": "{ name }",
+                "@resolver": {
+                  "name": "util:noop",
+                  "results": {
+                    "ops": [
+                      {
+                        "path": "$",
+                        "mapping": "$source.name"
+                      }
+                    ]
+                  }
+                },
+                "type": "string",
+                "@mapping": "shapedb:BigCommerce_Product.OLFVDGwCzM",
+                "title": "Title"
+              },
+              "vector": {
+                "type": "array",
+                "@dependencies": "{name plainTextDescription}",
+                "@resolver": {
+                  "name": "ai:createEmbedding",
+                  "service": "openai",
+                  "model": "text-embedding-3-small",
+                  "options": {
+                    "useDependencies": true
+                  }
+                },
+                "items": {
+                  "type": "number"
+                },
+                "title": "Vector",
+                "@tag": "vector"
+              }
+            }
+          }
+        ]
+      },
+      "interfaces": [
+        "big-commerce:Node"
+      ]
+    },
+    "StoreResearch": {
+      "id": "kWxe-bS9z",
+      "name": "StoreResearch",
+      "title": "Store Research",
+      "model": {
+        "type": "single"
+      },
+      "schema": {
+        "type": "object",
+        "properties": {
+          "brandGuidelines": {
+            "@mapping": "shapedb:StoreResearch.kALYDnyag",
+            "type": "string",
+            "title": "Brand"
+          },
+          "generalInfo": {
+            "@mapping": "shapedb:StoreResearch.CpveWSwsq",
+            "type": "string",
+            "title": "General Info"
+          }
+        }
+      }
+    },
+    "BrandedChatMemory": {
+      "id": "QPRxjYGqc",
+      "name": "BrandedChatMemory",
+      "title": "Branded Chat Memory",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "brandGuidelines": {
+            "@mapping": "shapedb:BrandedChatMemory.z2HlH0j9x",
+            "type": "string",
+            "title": "Brand Guidelines Research"
+          },
+          "generalInfo": {
+            "@mapping": "shapedb:BrandedChatMemory.FXnIdUjl3",
+            "type": "string",
+            "title": "General Info"
+          },
+          "cartId": {
+            "@mapping": "shapedb:BrandedChatMemory.BafBUNE97",
+            "type": "string",
+            "title": "Cart Id"
+          }
+        }
+      }
+    },
+    "BrandedChatArtifact": {
+      "id": "-4NQoRpt0",
+      "name": "BrandedChatArtifact",
+      "title": "Branded Chat Artifact",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "cartId": {
+            "@mapping": "shapedb:BrandedChatArtifact.cblpLESbA",
+            "type": "string",
+            "title": "Cart Id"
+          }
+        }
+      }
+    }
+  },
+  "workflows": {},
+  "forms": {
+    "BigCommerce_Product": {
+      "default": {
+        "properties": {
+          "tid": {
+            "widget": "singleLineText"
+          },
+          "imageUrl": {
+            "widget": "singleLineText"
+          },
+          "title": {
+            "widget": "singleLineText"
+          }
+        },
+        "order": [
+          "tid",
+          "imageUrl",
+          "title"
+        ]
+      }
+    },
+    "StoreResearch": {
+      "default": {
+        "properties": {
+          "brandGuidelines": {
+            "widget": "markdownText"
+          },
+          "generalInfo": {
+            "widget": "markdownText"
+          }
+        },
+        "order": [
+          "brandGuidelines",
+          "generalInfo"
+        ]
+      }
+    },
+    "BrandedChatMemory": {
+      "default": {
+        "properties": {
+          "brandGuidelines": {
+            "widget": "markdownText"
+          },
+          "generalInfo": {
+            "widget": "markdownText"
+          },
+          "cartId": {
+            "widget": "singleLineText"
+          }
+        },
+        "order": [
+          "brandGuidelines",
+          "generalInfo",
+          "cartId"
+        ]
+      }
+    },
+    "BrandedChatArtifact": {
+      "default": {
+        "properties": {
+          "cartId": {
+            "widget": "singleLineText"
+          }
+        },
+        "order": [
+          "cartId"
+        ]
+      }
+    }
+  },
+  "schemaVersion": "3.59.0",
+  "apiVersion": "2",
+  "services": {
+    "openai": {
+      "id": "openai",
+      "title": "OpenAI",
+      "namespace": "OpenAI",
+      "provider": "openai",
+      "serviceType": "openapi",
+      "authenticationType": "bearer",
+      "options": {
+        "endpoint": "https://api.openai.com/v1/",
+        "spec": "https://raw.githubusercontent.com/takeshape/openapi-specs/813784d8fcac5b3fd4e468ce6f715b89c9fcb73f/specs/openai/v2.yml",
+        "transformVersion": "2.0.0",
+        "introspectedAt": "2025-09-18T01:38:22.115Z"
+      },
+      "authentication": "8mcWoUMmErd1nOgGUvdCFGLjJmQS/k9RQhmmc60i07tjpNaVY9ndKs9VAWHFcpiztcDk/8IJ2ToC1QKs1Q8+nu+AN7QbNRRRgYiKwKAHCOJmhLpoX5fjO7uj7scZPDzkEdvGMR6t+PBlKzgC1UTnWpdpaZHhf1EqpqjgEN506DOQ2uJE8XZkrQqSEXZ45rXP4QrwL3lY7g3/DdWvDB49w1P0iEHOf+mJywfWBZluoMjVfua0vMkT0zTxQB/g0fidSmoHambXP/iTuWirghZ0lA=="
+    },
+    "big-commerce": {
+      "id": "big-commerce",
+      "title": "BigCommerce",
+      "namespace": "BigCommerce",
+      "provider": "bigcommerce",
+      "serviceType": "graphql",
+      "authenticationType": "custom",
+      "options": {
+        "endpoint": "https://store-ieevx2ogrw.mybigcommerce.com/graphql",
+        "apiPath": "https://api.bigcommerce.com/stores/ieevx2ogrw/v3/",
+        "introspectedAt": "2025-09-19T03:28:42.018Z"
+      },
+      "authentication": "JHvzFR9dO1KW95saSa8DnWAERbGgiidBPOBUnYN+nsarG6O7gTmU7+/2o/TWAyiQcL+eP2crKHwLgxaHztj5PoX6sIvruQtlSvB8mM4vUy5y"
+    }
+  },
+  "agents": {
+    "brandedChat": {
+      "api": {
+        "inputs": [
+          {
+            "type": "mutation",
+            "name": "brandedChat",
+            "args": "TSChatArgs"
+          }
+        ]
+      },
+      "memory": {
+        "sessionMemory": {
+          "shape": "BrandedChatMemory"
+        }
+      },
+      "start": {
+        "transitions": [
+          {
+            "type": "suspend",
+            "destination": "NVTK81S3_",
+            "input": "brandedChat"
+          }
+        ]
+      },
+      "protection": {
+        "enabled": true
+      },
+      "states": {
+        "6U0W4CaY1": {
+          "name": "branded_chat",
+          "execution": {
+            "type": "chat",
+            "service": "openai",
+            "model": "gpt-4.1-2025-04-14",
+            "input": {
+              "type": "arg"
+            },
+            "systemPrompt": "# Shopping Assistant\n\n## Core Identity & Constraints\nYou are a helpful shopping assistant. Help the customer select products to purchase. Use your general knowledge of the types of products offered to make suggestions.\n\n{{brand_guidelines}}  \n\n{{general_info}}  \n\n## Product Suggestion Process\n\n**Step-by-step process:**\n\n1. **Greet the customer** Greet the customer kindly, and start your reply by welcoming them to the store, and naming the store. \n2. **Ensure product type** Ensure that the customer is requesting a product or category of product that might be in the store. If they are completely off base remind them of the types of products the store sells using the **Brand Guidelines**. If they do not specify any type of product simply provide 3 random products they might be interested in. \n3. **Lookup Products** Supply appropriate `terms` to the `get_product_suggestions` query to find products relevant to the customer. Never fetch more than 5 products. If you attempt to fetch products and no results are returned try again without and `terms` and use your best effort to match the request with the information you got back.\n4. **Filter Products** Provide up to 3 of the most relevant products for the user to consider.\n5. **Display Products** Format the relevant filtered products with a single item on each line. Only display the product using the `tid` property which starts with `tid:`.\n6. **Product Details** If the customer requests more information about a product using the name, use the `get_product_details` tool and query with the `id` related to that product name.\n\n## Add Products To Cart Process\n\n**Step-by-step process:**\n\n1. **Product Quantity** If the customer does not specify a quantity assume it is 1.\n{{#if cart_id}}\n2. **Adding to an Existing Cart** If the customer wants to add a product to their cart use the `update_cart` tool. Provide the product's `id` and a `quantity` and use `{{cart_id}} as the `cartId`. If the customer does not specify a quantity assume it is 1.\n{{else}}\n2. **Creating a Cart** If the customer wants to add a product to their cart use the `create_cart` tool. Provide the product's `id` and a `quantity`.\n{{/if}}\n3. **Give the Cart Amount** After adding items to the cart tell the customer how much the current cart costs using the `formattedV2` value in the response.",
+            "tools": [
+              {
+                "name": "get_product_suggestions",
+                "args": [
+                  {
+                    "type": "agent",
+                    "argName": "text"
+                  },
+                  {
+                    "type": "agent",
+                    "argName": "size"
+                  }
+                ],
+                "ref": "Query.searchBigCommerceProductByVector",
+                "description": "Use this tool to get products to recommend to the customer.",
+                "selectionSet": "{\n  items {\n    tid\n    id: entityId\n    name\n    plainTextDescription\n  }\n}\n"
+              },
+              {
+                "name": "get_product_details",
+                "ref": "Query.BigCommerce_product",
+                "args": [
+                  {
+                    "type": "agent",
+                    "argName": "id"
+                  }
+                ],
+                "description": "Use this tool to get further details about a product, using the product's id.",
+                "selectionSet": "{\n  availabilityV2 {\n    description\n    status\n  }\n  brand {\n    name\n  }\n  categories(first: 5) {\n    edges {\n      cursor\n      node {\n        name\n      }\n    }\n  }\n  condition\n  depth {\n    unit\n    value\n  }\n  description\n  height {\n    unit\n    value\n  }\n  id: entityId\n  imageUrl\n  inventory {\n    hasVariantInventory\n    isInStock\n  }\n  name\n  plainTextDescription\n  reviewSummary {\n    numberOfReviews\n    summationOfRatings\n  }\n  sku\n  title\n  type\n  warranty\n  weight {\n    unit\n    value\n  }\n  width {\n    unit\n    value\n  }\n}\n"
+              },
+              {
+                "name": "create_cart",
+                "ref": "Mutation.BigCommerce_createCart",
+                "args": [
+                  {
+                    "type": "agent",
+                    "argName": "id"
+                  },
+                  {
+                    "type": "agent",
+                    "argName": "quantity"
+                  }
+                ],
+                "selectionSet": "{\n  cart {\n    cartId: entityId\n    amount {\n      formattedV2\n    }    \n  }\n}\n",
+                "description": "Use this tool to create and add items to a customer's cart."
+              },
+              {
+                "selectionSet": "{\n  cart {\n    amount {\n      formattedV2\n    }    \n  }\n}\n",
+                "name": "update_cart",
+                "ref": "Mutation.BigCommerce_updateCart",
+                "args": [
+                  {
+                    "type": "agent",
+                    "argName": "cartId"
+                  },
+                  {
+                    "type": "agent",
+                    "argName": "id"
+                  },
+                  {
+                    "type": "agent",
+                    "argName": "quantity"
+                  }
+                ],
+                "description": "Use this tool to add items to an existing cart."
+              }
+            ],
+            "artifact": "BrandedChatArtifact"
+          },
+          "transitions": [
+            {
+              "type": "suspend",
+              "destination": "6U0W4CaY1",
+              "input": "brandedChat",
+              "sessionMemory": [
+                {
+                  "memoryPath": "cartId",
+                  "expression": "currentStateOutput.artifact.cartId"
+                }
+              ]
+            }
+          ],
+          "variables": [
+            {
+              "name": "brand_guidelines",
+              "steps": [
+                {
+                  "expression": "sessionMemory.brandGuidelines"
+                }
+              ]
+            },
+            {
+              "name": "general_info",
+              "steps": [
+                {
+                  "expression": "sessionMemory.generalInfo"
+                }
+              ]
+            },
+            {
+              "name": "cart_id",
+              "steps": [
+                {
+                  "expression": "sessionMemory.cartId"
+                }
+              ]
+            }
+          ]
+        },
+        "NVTK81S3_": {
+          "name": "get_store_research",
+          "execution": {
+            "type": "graphql",
+            "query": "query GetStoreResearch {\n  getStoreResearch {\n    brandGuidelines\n    generalInfo\n    }\n}\n",
+            "path": "getStoreResearch"
+          },
+          "transitions": [
+            {
+              "type": "immediate",
+              "destination": "6U0W4CaY1",
+              "sessionMemory": [
+                {
+                  "memoryPath": "brandGuidelines",
+                  "expression": "currentStateOutput.brandGuidelines"
+                },
+                {
+                  "memoryPath": "generalInfo",
+                  "expression": "currentStateOutput.generalInfo"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "historyStrategies": {}
+    },
+    "storeResearchAgent": {
+      "systemPrompt": "# Store Research Assistant\n\n## Core Identity & Constraints\nYou are a brand research assistant. You should learn about a store to understand the types of products offered, and to capture the general tone and identity of the store for communicating with customers, as well as providing general information about contacts, the store and it's policies.\n\n## Formatting \n* Write in markdown using clear and concise headlines.",
+      "api": {
+        "inputs": [
+          {
+            "type": "mutation",
+            "name": "storeResearch",
+            "args": "TSGenerateArgs"
+          }
+        ]
+      },
+      "memory": {
+        "sessionMemory": {
+          "shape": "StoreResearch"
+        }
+      },
+      "start": {
+        "transitions": [
+          {
+            "type": "suspend",
+            "destination": "ys0oWI2Ju",
+            "input": "storeResearch"
+          }
+        ]
+      },
+      "states": {
+        "ys0oWI2Ju": {
+          "name": "do_brand_guidelines_research",
+          "execution": {
+            "type": "generate",
+            "service": "openai",
+            "model": "gpt-4.1-mini-2025-04-14",
+            "input": {
+              "type": "arg"
+            },
+            "systemPrompt": "## Instructions\n1. Iterate through the products available in the store using the `get_products` tool. \n2. Review the `name` and `plainTextDescription` fields to understand what products are offered, what types of products the store sells, and the general tone and writing style that the store uses.\n3. Generate several paragraphs with clear instructions for another generative LLM model to use when communicating with customers. Use markdown headings to break up the different sections.",
+            "tools": [
+              {
+                "ref": "Query.BigCommerce_products",
+                "args": [
+                  {
+                    "type": "agent",
+                    "argName": "before"
+                  },
+                  {
+                    "type": "agent",
+                    "argName": "after"
+                  },
+                  {
+                    "type": "agent",
+                    "argName": "first"
+                  },
+                  {
+                    "type": "agent",
+                    "argName": "last"
+                  }
+                ],
+                "name": "get_products",
+                "description": "Use this tool to list products available in the store."
+              }
+            ]
+          },
+          "variables": [],
+          "transitions": [
+            {
+              "type": "immediate",
+              "destination": "ObYQ0gdLQ",
+              "sessionMemory": [
+                {
+                  "memoryPath": "brandGuidelines",
+                  "expression": "currentStateOutput"
+                }
+              ]
+            }
+          ]
+        },
+        "cIr0DgGTH": {
+          "name": "update_store_research",
+          "execution": {
+            "type": "graphql",
+            "query": "mutation UpdateStoreResearch($brandGuidelines: String, $generalInfo: String) {\n  updateStoreResearch(input: { brandGuidelines: $brandGuidelines, generalInfo: $generalInfo }) {\n    clientMutationId\n  }\n}\n"
+          },
+          "variables": [
+            {
+              "name": "brandGuidelines",
+              "steps": [
+                {
+                  "condition": "currentStateId",
+                  "expression": "sessionMemory.brandGuidelines"
+                }
+              ]
+            },
+            {
+              "name": "generalInfo",
+              "steps": [
+                {
+                  "condition": "currentStateId",
+                  "expression": "sessionMemory.generalInfo"
+                }
+              ]
+            }
+          ],
+          "transitions": [
+            {
+              "type": "immediate",
+              "destination": "END"
+            }
+          ]
+        },
+        "ObYQ0gdLQ": {
+          "name": "do_general_info_research",
+          "execution": {
+            "type": "generate",
+            "service": "openai",
+            "model": "gpt-4.1-mini-2025-04-14",
+            "input": {
+              "type": "arg"
+            },
+            "systemPrompt": "## Instructions\n1. Use the `get_general_info` tool to get information about the store and brands featured on it.\n2. Organize the different types of information under several markdown headings.",
+            "tools": [
+              {
+                "name": "get_general_info",
+                "ref": "big-commerce:Query.site",
+                "description": "Use this tool to get general information about the store.",
+                "selectionSet": "query GetStoreInfo {\n  settings {\n    contact {\n      email\n      phone\n    }\n    privacy {\n      privacyPolicyUrl\n    }\n    seo {\n      metaKeywords\n      metaDescription\n      pageTitle\n    }\n    storeName\n  }\n  popularBrands(first: 10) {\n    edges {\n      node {\n        name\n      }\n    }\n  }\n}"
+              }
+            ]
+          },
+          "transitions": [
+            {
+              "type": "immediate",
+              "destination": "L2b1Nijao",
+              "sessionMemory": [
+                {
+                  "memoryPath": "generalInfo",
+                  "expression": "currentStateOutput"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "historyStrategies": {}
+    }
+  }
+}

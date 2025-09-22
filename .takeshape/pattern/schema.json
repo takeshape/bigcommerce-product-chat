@@ -259,14 +259,18 @@
                 "title": "TakeShape ID"
               },
               "imageUrl": {
-                "@dependencies": "{ thumbnail: defaultImage { url(width: 100) } }",
+                "@dependencies": "{ defaultImage { url(width: 100) } }",
                 "@resolver": {
                   "name": "util:noop",
                   "results": {
                     "ops": [
                       {
                         "path": "$",
-                        "mapping": "$source.$$thumbnail.url"
+                        "mapping": "$source.imageUrl"
+                      },
+                      {
+                        "path": "$",
+                        "mapping": "$source.defaultImage.url"
                       }
                     ]
                   }

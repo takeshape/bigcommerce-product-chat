@@ -1,5 +1,13 @@
 {
   "name": "BigCommerce Product Chat",
   "description": "BigCommerce Product Chat",
-  "defaultTimezone": "America/New_York"
+  "defaultTimezone": "America/New_York",
+  "icon": "dollar-sign",
+  "color": "#95bf46",
+  "categories": [
+    "bigcommerce",
+    "ai chat",
+    "ai",
+    "products"
+  ]
 }

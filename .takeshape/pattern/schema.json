@@ -452,8 +452,6 @@
       }
     }
   },
-  "schemaVersion": "3.59.0",
-  "apiVersion": "2",
   "services": {
     "openai": {
       "id": "openai",
@@ -468,7 +466,7 @@
         "transformVersion": "2.0.0",
         "introspectedAt": "2025-09-18T01:38:22.115Z"
       },
-      "authentication": "8mcWoUMmErd1nOgGUvdCFGLjJmQS/k9RQhmmc60i07tjpNaVY9ndKs9VAWHFcpiztcDk/8IJ2ToC1QKs1Q8+nu+AN7QbNRRRgYiKwKAHCOJmhLpoX5fjO7uj7scZPDzkEdvGMR6t+PBlKzgC1UTnWpdpaZHhf1EqpqjgEN506DOQ2uJE8XZkrQqSEXZ45rXP4QrwL3lY7g3/DdWvDB49w1P0iEHOf+mJywfWBZluoMjVfua0vMkT0zTxQB/g0fidSmoHambXP/iTuWirghZ0lA=="
+      "authentication": "KcC39AurRHyhCbWR35kNoACUXYWfdOLp5Ssh7vSpoS/03qgxisCjoHa5szJKbh5iM5TP4rFdX/ZGhx3cgDxnL4B5NOEgCgOR+ipSjxW3ByN+zZp9SNFyr2fK5dHpPeAid1gLBXuexJyg3j+Mwqoum42xxnUrOpgCyAVdM32kYyZ5jk3sLbfe3bu3UGO0XyTxsVAUi/RivhxgRI045Bz/pzsJlpeZRxo0peRQoQLP5ASjTHNZDwi2Sazv834RON+f4AzhKLe+KlgVRMdZV3agFQ=="
     },
     "big-commerce": {
       "id": "big-commerce",
@@ -482,7 +480,7 @@
         "apiPath": "https://api.bigcommerce.com/stores/ieevx2ogrw/v3/",
         "introspectedAt": "2025-09-19T03:28:42.018Z"
       },
-      "authentication": "JHvzFR9dO1KW95saSa8DnWAERbGgiidBPOBUnYN+nsarG6O7gTmU7+/2o/TWAyiQcL+eP2crKHwLgxaHztj5PoX6sIvruQtlSvB8mM4vUy5y"
+      "authentication": "Q4ZPu6AuirrJehEYUAwQtp63DMb/lXqhdGFzwA7FpCZM8AYZXhztT7n3H2OoEs2oxJIjAsC/+37f89bU5K4QxXX44QRk2cbPpU65K+QFUsn9"
     }
   },
   "agents": {
@@ -790,7 +788,7 @@
           "transitions": [
             {
               "type": "immediate",
-              "destination": "L2b1Nijao",
+              "destination": "cIr0DgGTH",
               "sessionMemory": [
                 {
                   "memoryPath": "generalInfo",
@@ -803,5 +801,7 @@
       },
       "historyStrategies": {}
     }
-  }
+  },
+  "schemaVersion": "3.59.0",
+  "apiVersion": "2"
 }
